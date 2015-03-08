@@ -116,10 +116,10 @@ class Interceptor(object):
 
         while 1:
             try:
-                timeout = 0.05 if cached_master_data else 0
+                tmout = 0.1 if cached_master_data else None
 
                 rfds, wfds, xfds = select.select([master_fd,
-                      pty.STDIN_FILENO], [], [], timeout)
+                      pty.STDIN_FILENO], [], [], tmout)
             except select.error, e:
                 if e[0] == 4:   # Interrupted system call.
                     continue
