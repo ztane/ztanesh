@@ -87,6 +87,7 @@ Ubuntu
 
 Ubuntu install commands::
 
+    cd ~
     sudo apt-get install git-core highlight zsh perl
     git clone git://github.com/miohtama/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
@@ -225,6 +226,25 @@ Submitting patches
        git push
 
 5) On your personal Github repo page, press Make pull request button
+
+Related projects
+---------------------
+
+* `Presto <https://github.com/sorin-ionescu/prezto>`_
+
+* `Oh my ZSH <https://github.com/robbyrussell/oh-my-zsh/>`_ - integrated with ZtaneSH
+
+Troubleshooting
+------------------
+
+If ZSH does not start up properly (CTRL+C interruption, Git update failure, etc.) you may see the error::
+
+      /Users/mikko/.zsh//lib/ztanesh-rcs.zsh:103: command not found: rainbow-parade.py
+
+You can fix this issue by enabling ``comprc`` function by hand and run it to rebuild startup files::
+
+     source ~/tools/zsh-scripts/rc/65-functions
+     comprc
 
 License
 ----------
