@@ -1,26 +1,26 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # peacock - Pretty Enhanced Arbitrary Command Output Coloring Kit
 #
 # Python port of acoc
 #
-# Version : 0.1
+# Version : 0.2
 # Author : Antti Haapala <antti@haapala.name>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation under version 3, or (at your option)
 #   any later version.
-# 
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-# 
+#
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software Foundation,
 #   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-#    
+#
 #
 # Originally based on the Ruby language version by Ian McDonald,
 #
@@ -28,24 +28,23 @@
 #
 # Version : 0.7.1
 # Author  : Ian Macdonald <ian@caliban.org>
-# 
+#
 # Copyright (C) 2003-2005 Ian Macdonald
-# 
+#
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 2, or (at your option)
 #   any later version.
-# 
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-# 
+#
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software Foundation,
 #   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import with_statement
 
 """
 peacock
@@ -81,7 +80,7 @@ Original Ruby version written by Ian Macdonald <ian@caliban.org>
 
 COPYRIGHT
 ---------
-Copyright (C) 2013 Antti Haapala
+Portions Copyright (C) 2013-2016 Antti Haapala
 
 Portions Copyright (C) Joshua D. Bartlett
 
@@ -94,7 +93,7 @@ FOR A PARTICULAR PURPOSE.
 FILES
 -----
 
-* /usr/local/etc/acoc.con
+* /usr/local/etc/acoc.conf
 * /etc/acoc.conf
 * ~/.acoc.conf
 
@@ -121,7 +120,8 @@ BUGS
 ----
 
 * Nested regular expressions do not work well.
-* Inner subexpressions need to use clustering (?:), not capturing (). In other words, they can be used for matching, but not for coloring.
+* Inner subexpressions need to use clustering (?:), not capturing (). In other
+  words, they can be used for matching, but not for coloring.
 """
 
 import re
@@ -131,17 +131,19 @@ import sys
 
 from os.path import basename
 from collections import defaultdict
-from intercept import Interceptor
+from peacock_intercept import Interceptor
 
 PROGRAM_PATH = os.path.realpath(__file__)
 
 PROGRAM_NAME = basename(__file__)
-PROGRAM_VERSION = '0.1'
+PROGRAM_VERSION = '0.2'
 DEBUG=False
+
 
 def myprint(*args, **kwargs):
     file = kwargs.get('file', sys.stdout)
     file.write(' '.join([ str(i) for i in args ]) + '\n')
+
 
 class Program(object):
     def __init__(self, flags=""):
@@ -158,13 +160,17 @@ class Program(object):
     def __repr__(self):
         return "<program settings>"
 
+
 SECTION_HEAD = re.compile(r'\[(.*)\]')
 LINE_REGEX   = re.compile(r'(.)([^\1]*)\1(g?)\s+(.*)')
 
+
 cmd = defaultdict(Program)
+
 
 def nopmaker():
     return lambda a: a
+
 
 ATTRS = dict(
     bright='1',
@@ -180,6 +186,7 @@ ATTRS = dict(
     on_red='41'
 )
 
+
 def get_set(attr):
     rv = ATTRS.get(attr)
     if not rv:
@@ -187,18 +194,21 @@ def get_set(attr):
 
     return '\033[%sm' % rv
 
+
 def get_reset(attr):
     if attr in ATTRS:
         return "\033[0m"
 
     return ''
 
+
+
 class Rule(object):
     def __init__(self, regex, flags, colors):
         self.regex   = regex
         self.flags   = flags
         self.colors = colors
-        
+
         self.color_brackets = defaultdict(nopmaker)
         self.create_brackets()
 
@@ -272,15 +282,19 @@ class Rule(object):
         output += line[pos:]
         return output
 
+
 def debug(msg, *args):
     if not DEBUG:
         return
 
     myprint(msg % args, file=sys.stderr)
 
-# set things up
-#
+
 def initialize():
+    """
+    Read config files
+    """
+
     config_files = [
         os.path.join(os.path.dirname(PROGRAM_PATH), 'acoc.conf'),
         '/etc/acoc.conf',
@@ -294,8 +308,7 @@ def initialize():
         myprint("No readable config files found.", file=sys.stderr)
         sys.exit(1)
 
-# get configuration data
-#
+
 def parse_config(*files):
     parsed = False
 
@@ -338,8 +351,8 @@ def parse_config(*files):
                             invs.append(inv)
 
                         continue
-                    
-                    match = LINE_REGEX.match(line)  
+
+                    match = LINE_REGEX.match(line)
                     if not match:
                         myprint("Ignoring bad config line: %s" % line, file=sys.stderr)
                         continue
@@ -357,6 +370,7 @@ def parse_config(*files):
 
     return parsed
 
+
 class Colorizer(Interceptor):
     def __init__(self, prog):
         self.prog = prog
@@ -366,6 +380,7 @@ class Colorizer(Interceptor):
         super(Colorizer, self).__init__()
 
     def do_process(self, data):
+        data = data.decode('utf-8', errors='surrogateescape')
         line_end = ''
         if data.endswith('\n'):
             line_end = '\n'
@@ -378,39 +393,44 @@ class Colorizer(Interceptor):
                 replaced = j.do_sub(lines[i])
                 if replaced:
                     lines[i] = replaced
-                    break	
+                    break
 
-        return '\r\n'.join(lines) + line_end
+        return ('\r\n'.join(lines) + line_end).encode('utf-8', errors='surrogateescape')
 
-initialize()
 
-argv = sys.argv[1:]
-if not argv:
-    myprint("Usage: peacock PROGRAM ARGUMENTS...", file=sys.stderr)
-    sys.exit(1)
+def main():
+    initialize()
 
-argsjoined = ' '.join(argv)
-bestmatch = None
-bestlength = 0	
-cmdregexes = cmd.keys()
-
-for i in cmdregexes:
-    m = re.search('^' + i, argsjoined)
-    if m:
-        matchlen = len(m.group(0))
-        if matchlen > bestlength:
-            bestmatch = i
-            bestlength = matchlen
-
-if not bestmatch:
-    sys.stdout.flush()
-    try:
-        os.execvp(argv[0], argv)
-    except:
-        myprint("peacock: command not found: %s" % argv[0], file=sys.stderr)
+    argv = sys.argv[1:]
+    if not argv:
+        myprint("Usage: peacock PROGRAM ARGUMENTS...", file=sys.stderr)
         sys.exit(1)
 
-rules = cmd[bestmatch]
-colorizer = Colorizer(rules)
-argv = sys.argv[1:]
-colorizer.spawn(argv)
+    argsjoined = ' '.join(argv)
+    bestmatch = None
+    bestlength = 0
+    cmdregexes = cmd.keys()
+
+    for i in cmdregexes:
+        m = re.search('^' + i, argsjoined)
+        if m:
+            matchlen = len(m.group(0))
+            if matchlen > bestlength:
+                bestmatch = i
+                bestlength = matchlen
+
+    if not bestmatch:
+        sys.stdout.flush()
+        try:
+            os.execvp(argv[0], argv)
+        except:
+            myprint("peacock: command not found: %s" % argv[0], file=sys.stderr)
+            sys.exit(1)
+
+    rules = cmd[bestmatch]
+    colorizer = Colorizer(rules)
+    argv = sys.argv[1:]
+    colorizer.spawn(argv)
+
+if __name__ == '__main__':
+    main()

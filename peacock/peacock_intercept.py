@@ -29,19 +29,19 @@ import termios
 import tty
 
 class Interceptor(object):
-    '''
+    """
     This class does the actual work of the pseudo terminal. The spawn()
           function is the main entrypoint.
-    '''
+    """
 
     def __init__(self):
         self.master_fd = None
 
     def spawn(self, argv=None):
-        '''
+        """
         Create a spawned process.
         Based on the code for pty.spawn().
-        '''
+        """
         assert self.master_fd is None
         if not argv:
             argv = [os.environ['SHELL']]
@@ -75,22 +75,22 @@ class Interceptor(object):
         signal.signal(signal.SIGWINCH, old_handler)
 
     def _init_fd(self):
-        '''
+        """
         Called once when the pty is first set up.
-        '''
+        """
         self._set_pty_size()
 
     def _signal_winch(self, signum, frame):
-        '''
+        """
         Signal handler for SIGWINCH - window size has changed.
-        '''
+        """
         self._set_pty_size()
 
     def _set_pty_size(self):
-        '''
+        """
         Sets the window size of the child pty based on the window size of
              our own controlling terminal.
-        '''
+        """
         assert self.master_fd is not None
 
         # Get the terminal size of the real terminal, set it on the pseudoterminal.
@@ -105,14 +105,14 @@ class Interceptor(object):
         fcntl.ioctl(self.master_fd, termios.TIOCSWINSZ, buf)
 
     def _copy(self):
-        '''
+        """
         Main select loop. Passes all data to self.master_read() or
               self.stdin_read().
-        '''
+        """
         assert self.master_fd is not None
         master_fd = self.master_fd
 
-        cached_master_data = ''
+        cached_master_data = b''
 
         while 1:
             try:
@@ -120,7 +120,7 @@ class Interceptor(object):
 
                 rfds, wfds, xfds = select.select([master_fd,
                       pty.STDIN_FILENO], [], [], tmout)
-            except select.error, e:
+            except select.error as e:
                 if e[0] == 4:   # Interrupted system call.
                     continue
 
@@ -135,11 +135,11 @@ class Interceptor(object):
                 master_data = cached_master_data
 
             if master_data:
-                cached_master_data = ''
+                cached_master_data = b''
                 lines = master_data.splitlines(True)
 
                 for i in lines:
-                    if not full_buffer or i.endswith('\n'):
+                    if not full_buffer or i.endswith(b'\n'):
                         self.master_read(i)
 
                     else:
@@ -150,29 +150,29 @@ class Interceptor(object):
                 self.stdin_read(data)
 
     def write_stdout(self, data):
-        '''
+        """
         Writes to stdout as if the child process had written the data.
-        '''
+        """
         if not self.isatty:
-            data = data.replace('\r\n', '\n')
+            data = data.replace(b'\r\n', b'\n')
 
         os.write(pty.STDOUT_FILENO, data)
 
     def write_master(self, data):
-        '''
+        """
         Writes to the child process from its controlling terminal.
-        '''
+        """
         master_fd = self.master_fd
         assert master_fd is not None
-        while data != '':
+        while data != b'':
             n = os.write(master_fd, data)
             data = data[n:]
 
     def master_read(self, data):
-        '''
+        """
         Called when there is data to be sent from the child process back to
              the user.
-        '''
+        """
         data = self.do_process(data)
         self.write_stdout(data)
 
@@ -180,8 +180,8 @@ class Interceptor(object):
         return data
 
     def stdin_read(self, data):
-        '''
+        """
         Called when there is data to be sent from the user/controlling
              terminal down to the child process.
-        '''
+        """
         self.write_master(data)

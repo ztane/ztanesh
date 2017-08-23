@@ -116,9 +116,8 @@ _alias_unexisting_with_existing ooimpress loimpress
 _alias_unexisting_with_existing oomath lomath
 _alias_unexisting_with_existing ooweb loweb
 
-
-# Super colorizations - these absolutely require python2
-if _is_command python2
+# Super colorizations - these absolutely require python3
+if _is_command python3
 then
     alias ls='lsx'
     if _is_command peacock
