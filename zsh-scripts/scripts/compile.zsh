@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-export GLOBALRC=~/.zsh/rc
+export GLOBALRC=${0:A:h:h:h:h}/.zsh/rc
 export ALLRCS=$GLOBALRC/../lib/ztanesh-rcs.new
 export ALLRCS_TO=$GLOBALRC/../lib/ztanesh-rcs.zsh
 
