@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from __future__ import with_statement
 
 import os
@@ -20,7 +20,7 @@ dont_process_args = '''
     -none
 '''.split()
 
-LINE_REGEX = re.compile('''
+LINE_REGEX = re.compile(b'''
        ^(.{10}\+?                   # drwxrwxrwx + optional +
 
        \s+\d+\s+)                   # links
@@ -38,21 +38,22 @@ def grname(gid):
     except:
         return str(gid)
 
+
 class Runner(object):
     def read_color_config(self, filename, self_name, aux_list=[]):
         colors = { }
-    
+
         with open(filename) as config:
             for i in config:
                 contents = i.split('=', 1)
-    
+
                 if len(contents) != 2:
                     continue
-    
+
                 unames, color = contents
                 color = color.strip()
                 unames = unames.split(';')
-    
+
                 unames = [ u.strip() for u in unames ]
 
                 if '%self' in unames:
@@ -64,34 +65,33 @@ class Runner(object):
                     unames.remove('%aux')
 
                 for u in unames:
-                    colors[u] = '\033[%s' % color
-    
+                    colors[u.encode()] = ('\033[%s' % color).encode()
+
         return colors
 
-    
     def do_simple_ls(self, ls_command, arguments):
         rc = subprocess.call([ls_command] + arguments)
         sys.exit(rc)
-    
+
 
     def colorize(self, dictionary, value):
         if value not in dictionary:
             return value
 
-        return dictionary[value] + value + '\033[0m'
+        return dictionary[value] + value + b'\033[0m'
 
 
     def stripe(self, value):
         parts = []
         color = 0
-        colorstrings = [ '\033[38;5;227m', '\033[38;5;249m' ]
+        colorstrings = [ b'\033[38;5;227m', b'\033[38;5;249m' ]
 
         while value:
             parts.insert(0, colorstrings[color] + value[-3:])
             color = not color
             value = value[:-3]
 
-        return ''.join(['\033[0m'] + parts + ['\033[0m'])
+        return b''.join([b'\033[0m'] + parts + [b'\033[0m'])
 
 
     def do_line_subst(self, match):
@@ -106,37 +106,37 @@ class Runner(object):
         if len(m) > 5:
             m[5] = self.stripe(m[5])
 
-        return ''.join(m)
+        return b''.join(m)
 
-    
+
     def main(self):
         ls_command = '/bin/ls'
-    
+
         for i in ls_commands:
             if os.access(i, os.X_OK):
                 ls_command = i
                 break
-    
+
         arguments = sys.argv[1:]
         argset = set(sys.argv)
-    
+
         # if we are doing a simple ls here ... without anything to color
         for i in dont_process_args:
             if i in argset:
                 self.do_simple_ls(ls_command, arguments)
                 sys.exit(1)
-    
+
         config_path = os.path.expanduser('~/.zsh/etc')
-    
+
         try:
             user = pwd.getpwuid(os.getuid()).pw_name
             self.user_colors = self.read_color_config(
                 os.path.join(config_path, 'ls_u_colors'),
                 user)
-    
+
         except Exception:
             self.user_colors = {}
-    
+
         try:
             group = grname(os.getgid())
             auxgroups = set(grname(i) for i in os.getgroups())
@@ -147,19 +147,19 @@ class Runner(object):
                 os.path.join(config_path, 'ls_g_colors'),
                 group,
                 auxgroups)
-    
+
         except Exception:
             self.group_colors = {}
-    
+
         ls_pipe = subprocess.Popen(
             [ ls_command, '--color', '-lF' ] + arguments,
             stdout=subprocess.PIPE
         )
-        
+
         for i in ls_pipe.stdout:
             i = LINE_REGEX.sub(self.do_line_subst, i)
-            sys.stdout.write(i)
-    
+            sys.stdout.buffer.write(i)
+
         sys.exit(ls_pipe.returncode)
 
 if __name__ == '__main__':
