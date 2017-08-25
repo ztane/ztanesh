@@ -95,7 +95,7 @@ class Runner(object):
 
 
     def do_line_subst(self, match):
-        m = list(i or '' for i in match.groups())
+        m = list(i or b'' for i in match.groups())
 
         username = m[1]
         m[1] = self.colorize(self.user_colors, m[1])
