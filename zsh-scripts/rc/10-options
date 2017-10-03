@@ -38,5 +38,5 @@ function _run_pager {
         ${=PAGER} "$@"
 }
 
-export PAGER='less +g -RSC'
+export PAGER='less -RSC'
 READNULLCMD='_run_pager'
