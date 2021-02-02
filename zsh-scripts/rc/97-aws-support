@@ -1,0 +1,8 @@
+change_aws_profile() {
+    export AWS_PROFILE=$(sed -n -E 's/^\[profile (.*)\]/\1/p' ~/.aws/config | sort | fzf --height=25% --reverse)
+    zle reset-prompt
+}
+
+zle -N change_aws_profile{,}
+bindkey '^X^A' change_aws_profile
+
