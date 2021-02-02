@@ -7,11 +7,11 @@ will make your shell more powerful and easier to use.
 
 .. contents ::
 
-.. image:: https://github.com/downloads/miohtama/ztanesh/Screen%20shot%202012-05-07%20at%207.52.12%20PM.png
+.. image:: https://github.com/downloads/ztane/ztanesh/Screen%20shot%202012-05-07%20at%207.52.12%20PM.png
 
 *The screenshot above shows additional ls coloring. Prompt: top left is active virtualenv etc. development environment, top right is server, time, bottom right is path*.
 
-.. image:: https://github.com/downloads/miohtama/ztanesh/Screen%20Shot%202012-05-22%20at%2011.01.46%20PM.png
+.. image:: https://github.com/downloads/ztane/ztanesh/Screen%20Shot%202012-05-22%20at%2011.01.46%20PM.png
 
 *Colorize terminal tabs automatically based on which server you are logged in. No need to preconfigure servers - the color is calculated from the hostname*
 
@@ -83,7 +83,7 @@ Stable vs. dev branch
 
 If you want to leave on the bleeding edge use *dev* branch::
 
-    git clone -b dev git://github.com/miohtama/ztanesh.git ~/tools
+    git clone -b dev git://github.com/ztane/ztanesh.git ~/tools
 
 ZSH versions
 ++++++++++++++++
@@ -98,7 +98,7 @@ Ubuntu install commands::
 
     cd ~
     sudo apt-get install git-core highlight zsh perl
-    git clone git://github.com/miohtama/ztanesh.git ~/tools
+    git clone git://github.com/ztane/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
 
 Test that ZSH starts properly::
@@ -119,7 +119,7 @@ Gentoo
 Gentoo Linux install commands::
 
     sudo emerge -av git highlight zsh
-    git clone git://github.com/miohtama/ztanesh.git ~/tools
+    git clone git://github.com/ztane/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
 
 Test that ZSH starts properly::
@@ -153,7 +153,7 @@ Or use `Homebrew <http://mxcl.github.com/homebrew/>`_::
 
 Clone ztanesh::
 
-    git clone git://github.com/miohtama/ztanesh.git ~/tools
+    git clone git://github.com/ztane/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
 
 Test that ZSH starts properly::
@@ -169,7 +169,7 @@ Other 'NIX operating systems
 ++++++++++++++++++++++++++++++
 
 Other UNIX flavour operating systems should work just fine. Please adjust the installation
-commands according to your distribution and `report back to us how you did it <https://github.com/miohtama/ztanesh/issues>`_.
+commands according to your distribution and `report back to us how you did it <https://github.com/ztane/ztanesh/issues>`_.
 
 Autoupdate notes
 ++++++++++++++++++
