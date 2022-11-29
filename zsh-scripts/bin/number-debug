@@ -1,0 +1,55 @@
+#!/usr/bin/python3
+import sys
+import datetime
+
+try:
+    import readline
+except Exception as e:
+    pass
+
+
+def detect_timestamp(unit, number):
+    try:
+        ts = datetime.datetime.utcfromtimestamp(number)
+        print(f'timestamp ({unit}):' + (2 - len(unit)) * ' ', ts.isoformat())
+    except Exception as e:
+        print(f'Not usable as a timestamp ({unit})', file=sys.stderr)
+
+def mainloop():
+    while True:
+        number = input('enter number or empty to exit> ').strip()
+        if not number:
+            break
+
+        number = number.replace(',', '.')
+        try:
+            number = int(number, 0)
+        except ValueError as e:
+            try:
+                number = float(number)
+            except ValueError as e:
+                print(f'not a number: {number}', file=sys.stderr)
+                continue
+
+        if isinstance(number, int):
+             print('An int', file=sys.stderr)
+             print(f'decimal:        {number}', file=sys.stderr)
+             print(f'hexadecimal:    {number:x}', file=sys.stderr)
+             print(f'binary:         {number:b}', file=sys.stderr)
+             print(f'octal:          {number:o}', file=sys.stderr)
+
+        else:
+             print('A float', file=sys.stderr)
+             print(f'decimal:        {number}', file=sys.stderr)
+             print(f'hexadecimal:    {number.hex()}', file=sys.stderr)
+
+        detect_timestamp('s', number)
+        detect_timestamp('ms', number / 1000)
+
+
+try:
+    mainloop()
+except KeyboardInterrupt:
+    pass
+
+print('bye!', file=sys.stderr)
