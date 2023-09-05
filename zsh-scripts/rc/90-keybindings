@@ -41,3 +41,11 @@ then
         function zle-line-finish () {
         }
 fi
+
+# reset the time in the prompt upon accept line
+function _reset-prompt-and-accept-line {
+  zle reset-prompt
+  zle .accept-line     # Note the . meaning the built-in accept-line.
+}
+
+zle -N accept-line _reset-prompt-and-accept-line

@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+
+# Gives the country code of the Geo IP database
+# for the IP that you connect to the internet
+
+import requests
+
+
+def get_ip():
+    response = requests.get('https://api64.ipify.org?format=json').json()
+    return response["ip"]
+
+
+def get_location():
+    ip_address = get_ip()
+    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json()
+    return response['country_code_iso3']
+
+
+try:
+    print(get_location())
+except:
+    print('UNK')
