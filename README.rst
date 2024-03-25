@@ -83,7 +83,7 @@ Stable vs. dev branch
 
 If you want to leave on the bleeding edge use *dev* branch::
 
-    git clone -b dev git://github.com/ztane/ztanesh.git ~/tools
+    git clone -b dev https://github.com/interjektio/ztanesh.git ~/tools
 
 ZSH versions
 ++++++++++++++++
@@ -98,8 +98,9 @@ Ubuntu install commands::
 
     cd ~
     sudo apt-get install git-core highlight zsh perl
-    git clone git://github.com/ztane/ztanesh.git ~/tools
+    git clone https://github.com/interjektio/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
+    ~/tools/zsh-scripts/setup-skel.zsh
 
 Test that ZSH starts properly::
 
@@ -119,7 +120,7 @@ Gentoo
 Gentoo Linux install commands::
 
     sudo emerge -av git highlight zsh
-    git clone git://github.com/ztane/ztanesh.git ~/tools
+    git clone https://github.com/interjektio/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
 
 Test that ZSH starts properly::
@@ -153,7 +154,7 @@ Or use `Homebrew <http://mxcl.github.com/homebrew/>`_::
 
 Clone ztanesh::
 
-    git clone git://github.com/ztane/ztanesh.git ~/tools
+    git clone https://github.com/interjektio/ztanesh.git ~/tools
     ~/tools/zsh-scripts/setup.zsh
 
 Test that ZSH starts properly::
