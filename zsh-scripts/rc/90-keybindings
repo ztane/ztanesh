@@ -18,6 +18,20 @@ bindkey '^[[1;3D' stack-cd-forward
 bindkey '^[[1;3C' stack-cd-backward
 bindkey '^[[Z'    reverse-menu-complete
 
+# Vi keybindings for the distinguished ladies and gentlemen
+bindkey -M viins '^r' history-incremental-search-backward
+bindkey -M vicmd '^r' history-incremental-search-backward
+bindkey -M viins '^P' up-history
+bindkey -M vicmd '^P' up-history
+bindkey -M viins '^N' down-history
+bindkey -M vicmd '^N' down-history
+bindkey -M viins '^?' backward-delete-char
+bindkey -M vicmd '^?' backward-delete-char
+bindkey -M viins '^r' backward-delete-char
+bindkey -M vicmd '^r' backward-delete-char
+bindkey -M viins '^h' backward-kill-word
+bindkey -M vicmd '^h' backward-kill-word
+
 function copy-region-as-kill-deactivate-mark {
   zle copy-region-as-kill
   zle set-mark-command -n -1
