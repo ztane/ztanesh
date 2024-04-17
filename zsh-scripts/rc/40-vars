@@ -1,6 +1,7 @@
 prepend_to_path ~/.zsh/bin
 prepend_to_path ~/.bin
 prepend_to_path ~/tools/bin
+prepend_to_path /opt/local/bin
 
 if [[ ! -z "$GNU_COREUTILS_DIR" ]]
 then

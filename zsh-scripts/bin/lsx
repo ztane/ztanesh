@@ -9,6 +9,7 @@ import subprocess
 import re
 
 ls_commands = '''
+    /opt/homebrew/bin/gls
     /usr/local/bin/gls
     /opt/local/libexec/gnubin/ls
     /usr/bin/ls
