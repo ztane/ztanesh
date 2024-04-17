@@ -21,30 +21,36 @@ def main(zsh_path):
             ],
             stdout=subprocess.PIPE,
             cwd=directory,
+            check=True,
         )
         .stdout.decode()
         .strip()
     )
 
-    print("Cloning tools repository to /etc/skel")
-    subprocess.run(
-        [
-            "git",
-            "clone",
-            remote_url,
-            "tools",
-        ],
-        cwd="/etc/skel",
-    )
+    if os.path.exists("/etc/skel/tools"):
+        print("Skipping /etc/skel (tools directory already exists)")
+    else:
+        print("Cloning tools repository to /etc/skel")
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                remote_url,
+                "tools",
+            ],
+            cwd="/etc/skel",
+            check=True,
+        )
 
-    print("Running setup.zsh")
-    subprocess.run(
-        [
-            "tools/setup.zsh",
-            "/etc/skel",
-        ],
-        cwd="/etc/skel",
-    )
+        print("Running setup.zsh")
+        subprocess.run(
+            [
+                "tools/setup.zsh",
+                "/etc/skel",
+            ],
+            cwd="/etc/skel",
+            check=True,
+        )
 
     for user in list(pwd.getpwall()):
         shell = os.path.basename(user.pw_shell)
@@ -60,7 +66,8 @@ def main(zsh_path):
                     "-s",
                     zsh_path,
                     user.pw_name,
-                ]
+                ],
+                check=True,
             )
             shell = "zsh"
 
@@ -68,31 +75,41 @@ def main(zsh_path):
             print(f"Skipping {user.pw_name} (using {shell})")
             continue
 
-        print(f"Cloning tools repository to user home dir {user.pw_dir}")
-        subprocess.run(
-            [
-                "sudo",
-                "-u",
-                user.pw_name,
-                "git",
-                "clone",
-                remote_url,
-                "tools",
-            ],
-            cwd=user.pw_dir,
-        )
+        if os.path.exists(f"{user.pw_dir}/tools"):
+            print(f"Skipping {user.pw_name} (tools directory already exists)")
+            continue
 
-        print(f"Running setup.zsh for {user.pw_name}")
-        subprocess.run(
-            [
-                "sudo",
-                "-u",
-                user.pw_name,
-                "tools/setup.zsh",
-                user.pw_dir,
-            ],
-            cwd=user.pw_dir,
-        )
+        try:
+            print(f"Cloning tools repository to user home dir {user.pw_dir}")
+            subprocess.run(
+                [
+                    "sudo",
+                    "-u",
+                    user.pw_name,
+                    "git",
+                    "clone",
+                    remote_url,
+                    "tools",
+                ],
+                cwd=user.pw_dir,
+                check=True,
+            )
+
+            print(f"Running setup.zsh for {user.pw_name}")
+            subprocess.run(
+                [
+                    "sudo",
+                    "-u",
+                    user.pw_name,
+                    "tools/zsh-scripts/setup.zsh",
+                    user.pw_dir,
+                ],
+                cwd=user.pw_dir,
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e} for {user.pw_name}")
+            continue
 
 
 if __name__ == "__main__":
@@ -107,6 +124,6 @@ if __name__ == "__main__":
 
     if os.getuid() != 0:
         print("Root required... using sudo")
-        os.execvp(["sudo", sys.executable, *sys.argv])
+        os.execvp("sudo", ["sudo", sys.executable, *sys.argv])
 
     main(zsh_path)
