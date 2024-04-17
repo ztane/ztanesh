@@ -1,5 +1,4 @@
 zsh
 wget
-subversion
-bzr
+git-core
 

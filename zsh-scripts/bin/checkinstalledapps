@@ -6,7 +6,7 @@ then
     BASE=~
 fi
 
-if [[ ! -e `which lesspipe` ]]
+if [[ ! -e $(which lesspipe) ]]
 then
     echo "suggested: install lesspipe"
 else
@@ -19,7 +19,7 @@ else
     fi
 fi
 
-if [[ ! -e `which highlight` ]]
+if [[ ! -e $(which highlight) ]]
 then
     echo "suggested: install highlight"
 else
