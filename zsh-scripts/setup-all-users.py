@@ -45,7 +45,7 @@ def main(zsh_path):
         print("Running setup.zsh")
         subprocess.run(
             [
-                "tools/setup.zsh",
+                "tools/zsh-scripts/setup.zsh",
                 "/etc/skel",
             ],
             cwd="/etc/skel",
