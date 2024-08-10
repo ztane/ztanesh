@@ -21,7 +21,7 @@ dont_process_args = '''
     -none
 '''.split()
 
-LINE_REGEX = re.compile(b'''
+LINE_REGEX = re.compile(br'''
        ^(.{10}\+?                   # drwxrwxrwx + optional +
 
        \s+\d+\s+)                   # links
