@@ -10,8 +10,10 @@ except Exception as e:
 
 def detect_timestamp(unit, number):
     try:
-        ts = datetime.datetime.utcfromtimestamp(number)
+        ts = datetime.datetime.fromtimestamp(number, tz=datetime.timezone.utc).astimezone()
         print(f'timestamp ({unit}):' + (2 - len(unit)) * ' ', ts.isoformat())
+        ts = datetime.datetime.fromtimestamp(number, tz=datetime.timezone.utc).astimezone()
+        print(f'UTC ts ({unit}):   ' + (2 - len(unit)) * ' ', ts.isoformat())
     except Exception as e:
         print(f'Not usable as a timestamp ({unit})', file=sys.stderr)
 
@@ -21,6 +23,9 @@ def mainloop():
         if not number:
             break
 
+        debug_number(number)
+
+def debug_number(number):
         number = number.replace(',', '.')
         try:
             number = int(number, 0)
@@ -29,7 +34,7 @@ def mainloop():
                 number = float(number)
             except ValueError as e:
                 print(f'not a number: {number}', file=sys.stderr)
-                continue
+                return
 
         if isinstance(number, int):
              print('An int', file=sys.stderr)
@@ -47,9 +52,22 @@ def mainloop():
         detect_timestamp('ms', number / 1000)
 
 
+import sys
+
+args = sys.argv[1:]
+if args:
+    first = True
+    for arg in args:
+        if not first:
+            print('-' * 40)
+        first = False
+        debug_number(arg)
+
+    sys.exit(0)
+
 try:
     mainloop()
-except KeyboardInterrupt:
+except (KeyboardInterrupt, EOFError):
     pass
 
 print('bye!', file=sys.stderr)

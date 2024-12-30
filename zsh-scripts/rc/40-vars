@@ -1,4 +1,5 @@
 prepend_to_path ~/.zsh/bin
+prepend_to_path ~/.local/bin
 prepend_to_path ~/.bin
 prepend_to_path ~/tools/bin
 prepend_to_path /opt/local/bin
@@ -12,6 +13,7 @@ append_to_path  "/opt/bin"
 append_to_path  ~/tools/binfix
 
 export GREP_COLOR="1;31"
+export GREP_COLORS="mt=1;31"
 
 export PATH
 
