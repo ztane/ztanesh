@@ -7,7 +7,7 @@ import pwd
 
 
 def main(zsh_path):
-    directory = os.path.dirname(sys.argv[0])
+    directory = os.path.dirname(os.path.abspath(sys.argv[0]))
 
     print("Finding out remote URL")
     # get remote url for the current repository
