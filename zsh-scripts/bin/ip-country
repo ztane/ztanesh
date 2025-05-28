@@ -19,5 +19,5 @@ def get_location():
 
 try:
     print(get_location())
-except:
+except Exception as e:
     print('UNK')

@@ -1,0 +1,178 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["httpx", "beautifulsoup4", "rich", "requests"]
+# ///
+
+import requests
+from bs4 import BeautifulSoup
+from dataclasses import dataclass, field
+from typing import List, Optional
+from rich import print
+from rich.console import Console
+from rich.text import Text
+import argparse
+import re
+
+@dataclass
+class MenuLine:
+    dish: str
+    price: Optional[str] = None
+    diet_tags: List[str] = field(default_factory=list)
+
+@dataclass
+class LunchItem:
+    name: str
+    lines: List[MenuLine]
+    external_link: Optional[str] = None
+    distance_m: int = 0
+    lunch_time: Optional[str] = None
+
+COOKIES = {
+    "location_v2": '{"lat":"65.01099","lng":"25.47689","formattedAddress":"Mäkelininkatu+31, Oulu"}',
+    "layout_v2": '"rivit"',
+    "view_v2": '"lahistolla"',
+    "search_v2": '"sijainti"',
+    "showempty_v2": '"no"',
+}
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "X-Requested-With": "XMLHttpRequest",
+    "Accept": "*/*",
+    "Referer": "https://www.lounaat.info/",
+}
+
+BASE_URL = "https://www.lounaat.info/ajax/filter"
+
+DIET_COLOURS = {
+    "l": ("L", "yellow"),
+    "g": ("G", "green"),
+    "m": ("M", "red"),
+    "vl": ("VL", "orange1"),
+    "veg": ("VEG", "bright_green"),
+    "v": ("V", "bright_cyan"),
+}
+
+def parse_distance(text: str) -> int:
+    return int(float(text.replace("km", "").strip()) * 1000) if "km" in text else int(text.replace("m", "").strip())
+
+def extract_diets(tag: BeautifulSoup) -> List[str]:
+    return [a["href"].strip("#").lower() for a in tag.select("a.diet")]
+
+def fetch_lunch_items(max_distance: int) -> List[LunchItem]:
+    results: List[LunchItem] = []
+
+    for page in range(4):
+        params = {
+            "view": "lahistolla",
+            "day": "3",
+            "page": str(page),
+            "coords": "false",
+        }
+
+        resp = requests.get(BASE_URL, headers=HEADERS, cookies=COOKIES, params=params)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+
+        for r in soup.select("div.menu.item"):
+            name_tag = r.select_one("h3 a")
+            if not name_tag:
+                continue
+            name = name_tag.text.strip()
+
+            dist_tag = r.select_one("div.item-footer p.dist")
+            if not dist_tag:
+                continue
+            distance_m = parse_distance(dist_tag.text.strip())
+            if distance_m > max_distance:
+                continue
+
+            lunch_time_tag = r.select_one("p.lunch:not(.closed)")
+            lunch_time = None
+            if lunch_time_tag:
+                match = re.search(r"\d{1,2}[:.]?\d{0,2}\s*[-–]\s*\d{1,2}[:.]?\d{0,2}", lunch_time_tag.text)
+                if match:
+                    lunch_time = match.group(0).replace(".", ":").replace("–", "-").replace(" ", "")
+
+            external_link = None
+            lines: List[MenuLine] = []
+
+            link_tag = r.select_one("div.item-body a.missing")
+            if link_tag:
+                external_link = link_tag.get("href")
+            else:
+                for li in r.select("li.menu-item"):
+                    dish_tag = li.select_one("p.dish")
+                    if not dish_tag:
+                        continue
+                    dish_text = dish_tag.get_text(strip=True)
+                    diet_keys = extract_diets(dish_tag)
+                    price_tag = li.select_one("p.price")
+                    price = price_tag.get_text(strip=True) if price_tag else None
+                    lines.append(MenuLine(dish=dish_text, price=price, diet_tags=diet_keys))
+
+            results.append(LunchItem(
+                name=name,
+                lines=lines,
+                external_link=external_link,
+                distance_m=distance_m,
+                lunch_time=lunch_time
+            ))
+
+    return sorted(results, key=lambda x: x.distance_m)
+
+def format_diet_tags(tags: List[str]) -> List[Text]:
+    parts = []
+    for tag in tags:
+        label, colour = DIET_COLOURS.get(tag.lower(), (tag.upper(), "white"))
+        parts.append(Text(f" {label}", style=colour))
+    return parts
+
+import os
+import subprocess
+import sys
+from contextlib import contextmanager
+
+@contextmanager
+def maybe_pager():
+    if sys.stdout.isatty():
+        proc = subprocess.Popen(["less", "-FRX"], stdin=subprocess.PIPE, text=True)
+        try:
+            with proc.stdin as pipe:
+                yield pipe
+        finally:
+            proc.wait()
+    else:
+        yield sys.stdout
+
+def print_lunches(lunches: List[LunchItem]):
+    with maybe_pager() as output:
+        console = Console(file=output, force_terminal=True, color_system="truecolor")
+        for lunch in lunches:
+            header = Text(f"{lunch.name} ({lunch.distance_m} m)", style="bold blue")
+            if lunch.lunch_time:
+                header.append(f" [{lunch.lunch_time}]", style="dim cyan")
+            console.print(header)
+
+            if lunch.external_link:
+                console.print(f"[green]→ {lunch.external_link}[/green]")
+            else:
+                for line in lunch.lines:
+                    text = Text(f"• {line.dish}")
+                    if line.price:
+                        text.append(f" [{line.price}]", style="magenta")
+                    text += sum(format_diet_tags(line.diet_tags), Text(""))
+                    console.print(text)
+            print(file=output)
+
+def main():
+    parser = argparse.ArgumentParser(description="Fetch Oulu lunches from lounaat.info")
+    parser.add_argument("--max-distance", type=int, default=1500, help="Max distance in metres (default: 1500)")
+    args = parser.parse_args()
+
+    lunches = fetch_lunch_items(args.max_distance)
+    print_lunches(lunches)
+
+if __name__ == "__main__":
+    main()
