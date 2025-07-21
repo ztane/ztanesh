@@ -4,9 +4,47 @@ import os
 import sys
 import subprocess
 import pwd
+from pathlib import Path
+
+
+def set_default_shell(shell_path: str):
+    """
+    Sets the default shell for both useradd and adduser.
+
+    Args:
+        shell_path (str): Absolute path to the desired shell, e.g., '/usr/bin/zsh'.
+    """
+    def replace_or_append_var(path: Path, key: str, new_value: str):
+        if not path.exists():
+            print(f"{path} not found.")
+            return
+        key_eq = key + "="
+        lines = path.read_text().splitlines()
+        changed = False
+        for i, line in enumerate(lines):
+            if line.strip().startswith(key_eq):
+                lines[i] = f"{key_eq}{new_value}"
+                changed = True
+                break
+        if not changed:
+            lines.append(f"{key_eq}{new_value}")
+            print(f"{key_eq} not found in {path}, appending.")
+        else:
+            print(f"Updated {key_eq} in {path}")
+        path.write_text("\n".join(lines) + "\n")
+
+    new_shell = Path(shell_path)
+    if not new_shell.exists():
+        raise ValueError(f"Shell '{shell_path}' does not exist.")
+
+    replace_or_append_var(Path("/etc/default/useradd"), "SHELL", shell_path)
+    replace_or_append_var(Path("/etc/adduser.conf"), "DSHELL", shell_path)
 
 
 def main(zsh_path):
+    print("Attempting to set default shell to Zsh on Ubuntu/Debian")
+    set_default_shell(zsh_path)
+
     directory = os.path.dirname(os.path.abspath(sys.argv[0]))
 
     print("Finding out remote URL")
