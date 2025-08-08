@@ -13,6 +13,7 @@ from rich.console import Console
 from rich.text import Text
 import argparse
 import re
+from datetime import datetime
 
 @dataclass
 class MenuLine:
@@ -54,6 +55,16 @@ DIET_COLOURS = {
     "v": ("V", "bright_cyan"),
 }
 
+FINNISH_WEEKDAYS = [
+    "Maanantai",
+    "Tiistai",
+    "Keskiviikko",
+    "Torstai",
+    "Perjantai",
+    "Lauantai",
+    "Sunnuntai"
+]
+
 def parse_distance(text: str) -> int:
     return int(float(text.replace("km", "").strip()) * 1000) if "km" in text else int(text.replace("m", "").strip())
 
@@ -62,11 +73,19 @@ def extract_diets(tag: BeautifulSoup) -> List[str]:
 
 def fetch_lunch_items(max_distance: int) -> List[LunchItem]:
     results: List[LunchItem] = []
+    
+    # Get current weekday (0=Monday, 6=Sunday)
+    current_day = datetime.now().weekday()
+    # lounaat.info uses 1-5 for Mon-Fri, default to Monday for weekends
+    if current_day < 5:  # Monday to Friday
+        day_param = str(current_day + 1)
+    else:  # Saturday or Sunday
+        day_param = "1"  # Default to Monday
 
     for page in range(4):
         params = {
             "view": "lahistolla",
-            "day": "3",
+            "day": day_param,
             "page": str(page),
             "coords": "false",
         }
@@ -149,6 +168,18 @@ def maybe_pager():
 def print_lunches(lunches: List[LunchItem]):
     with maybe_pager() as output:
         console = Console(file=output, force_terminal=True, color_system="truecolor")
+        
+        # Display current date and weekday
+        now = datetime.now()
+        weekday = FINNISH_WEEKDAYS[now.weekday()]
+        date_str = now.strftime("%-d.%-m.%Y")
+        
+        # If it's weekend, show which day's menu we're displaying
+        if now.weekday() >= 5:  # Saturday or Sunday
+            console.print(f"[bold yellow]{weekday} {date_str} - Näytetään maanantain lounaslista[/bold yellow]\n")
+        else:
+            console.print(f"[bold yellow]{weekday} {date_str}[/bold yellow]\n")
+        
         for lunch in lunches:
             header = Text(f"{lunch.name} ({lunch.distance_m} m)", style="bold blue")
             if lunch.lunch_time:
