@@ -13,6 +13,7 @@ from rich.console import Console
 from rich.text import Text
 import argparse
 import re
+from datetime import datetime
 
 @dataclass
 class MenuLine:
@@ -62,11 +63,16 @@ def extract_diets(tag: BeautifulSoup) -> List[str]:
 
 def fetch_lunch_items(max_distance: int) -> List[LunchItem]:
     results: List[LunchItem] = []
+    
+    # Get current weekday (0=Monday, 4=Friday)
+    current_day = datetime.now().weekday()
+    # lounaat.info uses 1-5 for Mon-Fri
+    day_param = str(current_day + 1) if current_day < 5 else "5"
 
     for page in range(4):
         params = {
             "view": "lahistolla",
-            "day": "3",
+            "day": day_param,
             "page": str(page),
             "coords": "false",
         }
