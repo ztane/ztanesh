@@ -90,10 +90,17 @@ def main(zsh_path):
             check=True,
         )
 
+    # Check for non-interactive mode
+    noninteractive = bool(os.environ.get("ZTANESH_NONINTERACTIVE_SETUP"))
+    
     for user in list(pwd.getpwall()):
         shell = os.path.basename(user.pw_shell)
         if shell in ["sh", "bash"]:
-            approve = input(f"Setup for {user.pw_name} (now using {shell}) [Y/n]: ")
+            if noninteractive:
+                print(f"Non-interactive mode: automatically setting up {user.pw_name} (now using {shell})")
+                approve = "y"
+            else:
+                approve = input(f"Setup for {user.pw_name} (now using {shell}) [Y/n]: ")
             if approve.lower() not in ("y", "yes", ""):
                 continue
 

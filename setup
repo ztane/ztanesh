@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# Setup script for tools repository
+#
+# Usage (interactive):
+#   curl -sSL https://raw.githubusercontent.com/user/ztanesh/master/setup | bash -s -- user/ztanesh
+#
+# Usage (non-interactive):
+#   curl -sSL https://raw.githubusercontent.com/user/ztanesh/master/setup | ZTANESH_NONINTERACTIVE_SETUP=1 bash -s -- user/ztanesh
+#
+# Replace 'user/ztanesh' with your fork if you have one.
+#
+# This script will:
+# 1. Clone the specified GitHub repository to ~/tools
+# 2. Try SSH first (git@github.com), fall back to HTTPS if SSH fails
+# 3. Run ~/tools/zsh-scripts/setup-all-users.py to configure the system
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to print colored messages
+print_msg() {
+    local color=$1
+    shift
+    echo -e "${color}$@${NC}"
+}
+
+# Check if repository argument is provided
+if [ $# -eq 0 ]; then
+    print_msg $RED "Error: GitHub repository not specified"
+    print_msg $YELLOW "Usage: $0 <org/repo>"
+    print_msg $YELLOW "Example: $0 interjektio/tools"
+    exit 1
+fi
+
+GITHUB_REPO="$1"
+TOOLS_DIR="$HOME/tools"
+
+# Validate repository format
+if [[ ! "$GITHUB_REPO" =~ ^[a-zA-Z0-9_-]+/[a-zA-Z0-9_.-]+$ ]]; then
+    print_msg $RED "Error: Invalid repository format. Expected: org/repo"
+    exit 1
+fi
+
+print_msg $GREEN "Setting up tools from repository: $GITHUB_REPO"
+
+# Check if tools directory already exists
+if [ -d "$TOOLS_DIR" ]; then
+    print_msg $YELLOW "Warning: $TOOLS_DIR already exists"
+    if [ -n "$ZTANESH_NONINTERACTIVE_SETUP" ]; then
+        print_msg $YELLOW "Non-interactive mode: automatically removing existing directory"
+        rm -rf "$TOOLS_DIR"
+    else
+        read -p "Do you want to remove it and continue? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            print_msg $YELLOW "Removing existing $TOOLS_DIR..."
+            rm -rf "$TOOLS_DIR"
+        else
+            print_msg $RED "Setup cancelled"
+            exit 1
+        fi
+    fi
+fi
+
+# Try SSH first, then fallback to HTTPS
+SSH_URL="git@github.com:${GITHUB_REPO}.git"
+HTTPS_URL="https://github.com/${GITHUB_REPO}.git"
+
+print_msg $GREEN "Attempting to clone via SSH..."
+if git clone "$SSH_URL" "$TOOLS_DIR" 2>/dev/null; then
+    print_msg $GREEN "Successfully cloned via SSH"
+else
+    print_msg $YELLOW "SSH clone failed, trying HTTPS..."
+    if git clone "$HTTPS_URL" "$TOOLS_DIR"; then
+        print_msg $GREEN "Successfully cloned via HTTPS"
+    else
+        print_msg $RED "Error: Failed to clone repository"
+        print_msg $RED "Please check if the repository exists: $GITHUB_REPO"
+        exit 1
+    fi
+fi
+
+# Check if setup script exists
+SETUP_SCRIPT="$TOOLS_DIR/zsh-scripts/setup-all-users.py"
+if [ ! -f "$SETUP_SCRIPT" ]; then
+    print_msg $RED "Error: Setup script not found at $SETUP_SCRIPT"
+    print_msg $YELLOW "Repository cloned but setup script is missing"
+    exit 1
+fi
+
+# Make setup script executable
+chmod +x "$SETUP_SCRIPT"
+
+print_msg $GREEN "Running setup script..."
+if [ -n "$ZTANESH_NONINTERACTIVE_SETUP" ]; then
+    print_msg $YELLOW "Non-interactive mode enabled (ZTANESH_NONINTERACTIVE_SETUP=1)"
+fi
+
+# Pass environment variable to the Python script
+if ZTANESH_NONINTERACTIVE_SETUP="$ZTANESH_NONINTERACTIVE_SETUP" python3 "$SETUP_SCRIPT"; then
+    print_msg $GREEN "✓ Setup completed successfully!"
+    print_msg $GREEN "Tools repository installed at: $TOOLS_DIR"
+else
+    print_msg $RED "Error: Setup script failed"
+    exit 1
+fi
