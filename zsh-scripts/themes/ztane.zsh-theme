@@ -111,3 +111,6 @@ ZSH_THEME_GIT_PROMPT_PREFIX="[%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[yellow]%}✗%{$fg[white]%}]"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[white]%}]"
+ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE="⭳"    # Down arrow with base
+ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE="⭱"     # Up arrow with base
+ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE="⮃"  # Up arrow left of down arrow

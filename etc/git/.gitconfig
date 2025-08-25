@@ -36,3 +36,5 @@ lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen
 [init]
 defaultBranch = main
 
+[rerere]
+enabled = true
