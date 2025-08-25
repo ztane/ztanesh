@@ -4,7 +4,7 @@ Misc notes
 Other best practices
 ----------------------
 
-`Python and Javascript developer setup hints for OSX Lion <http://opensourcehacker.com/2012/04/27/python-and-javascript-developer-setup-hints-for-osx-lion/>`_  
+`Python and Javascript developer setup hints for OSX Lion <http://opensourcehacker.com/2012/04/27/python-and-javascript-developer-setup-hints-for-osx-lion/>`_
 
 
 Sudo + SSH forwards

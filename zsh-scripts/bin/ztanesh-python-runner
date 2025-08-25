@@ -22,7 +22,7 @@ module_name = sys.argv[1]
 module = __import__(module_name, globals(), locals(), ['__main__'], level=0)
 
 if not hasattr(module, '__main__'):
-    print("The module %s does not present a runnable command" 
+    print("The module %s does not present a runnable command"
             % module_name, file=sys.stderr)
     sys.exit(1)
 

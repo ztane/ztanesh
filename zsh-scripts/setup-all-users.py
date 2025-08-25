@@ -92,7 +92,7 @@ def main(zsh_path):
 
     # Check for non-interactive mode
     noninteractive = bool(os.environ.get("ZTANESH_NONINTERACTIVE_SETUP"))
-    
+
     for user in list(pwd.getpwall()):
         shell = os.path.basename(user.pw_shell)
         if shell in ["sh", "bash"]:

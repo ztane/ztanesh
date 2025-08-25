@@ -16,10 +16,3 @@ repos:
         entry: zsh -n
         language: system
         types: [shell]
-
-  # shfmt with zsh mode
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: main
-    hooks:
-      - id: shfmt
-        args: ["-i", "2", "-ln", "zsh"]

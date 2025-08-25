@@ -30,7 +30,7 @@ class Server(base.XClientBase, Thread):
             X.CopyFromParent,
             event_mask=(
                 X.StructureNotifyMask |
-                X.PropertyChangeMask  
+                X.PropertyChangeMask
             )
         )
 

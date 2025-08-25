@@ -3,4 +3,3 @@ if [[ -x /usr/lib/command-not-found ]] ; then
                 /usr/lib/command-not-found -- $1
         }
 fi
-

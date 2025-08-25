@@ -17,7 +17,7 @@ function comprc {
     then
         exec zsh
     fi
-} 
+}
 
 zmodload -F zsh/stat b:zstat
 function get-mtime {

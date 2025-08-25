@@ -19,7 +19,7 @@ function stack-cd {
 }
 
 function stack-cd-forward {
-   stack-cd 1 
+   stack-cd 1
 }
 
 function stack-cd-backward {

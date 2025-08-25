@@ -140,5 +140,5 @@ function nocolor {
     fi
 
     "$@"
-    return $?        
+    return $?
 }

@@ -19,4 +19,3 @@ overwrite-mode () {
 zle -N overwrite-mode
 
 change-insert-cursor
-

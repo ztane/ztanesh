@@ -8,15 +8,15 @@
 # Supports command completion.
 #
 # If you are not already using completion you might need to enable it with
-# 
+#
 #    autoload -U compinit compinit
 #
 # Changes:
 #
-# Defaults to the current application, and will walk up the tree to find 
+# Defaults to the current application, and will walk up the tree to find
 # a config.ru file and restart the corresponding app
 #
-# Will Detect if a app does not exist in pow and print a (slightly) helpful 
+# Will Detect if a app does not exist in pow and print a (slightly) helpful
 # error message
 
 rack_root_detect(){

@@ -5,4 +5,3 @@ if [[ ! -e "$HOME/.gitconfig" ]]
 then
         cp $HOME/tools/etc/git/.gitconfig $HOME
 fi
-

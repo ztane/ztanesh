@@ -3,7 +3,7 @@ import sys
 import os
 import zipimporter
 from struct import pack, unpack
-from Xlib import error 
+from Xlib import error
 
 import Xlib
 import Xlib.display
@@ -100,7 +100,6 @@ class XClientBase(object):
             self.server_window = the_window
 
             return True
-                
+
         except error.BadWindow:
             return False
-

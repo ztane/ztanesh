@@ -63,7 +63,7 @@ case "$words[1]" in
       '(--no-download)--no-download[only install downloaded packages]' \
       '(--install-option)--install-option[extra arguments to be supplied to the setup.py]' \
       '1: :->packages' &&  return 0
-     
+
       if [[ "$state" == packages ]]; then
         _pip_all
         _wanted piplist expl 'packages' compadd -a piplist

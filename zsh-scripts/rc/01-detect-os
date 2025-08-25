@@ -1,4 +1,4 @@
-OS_BY_UNAME=$(uname) 
+OS_BY_UNAME=$(uname)
 
 export LINUX=
 export GNU_USERLAND=
@@ -27,5 +27,3 @@ then
         GNU_COREUTILS_DIR=/opt/local/bin
     fi
 fi
-
-

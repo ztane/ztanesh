@@ -16,4 +16,3 @@ compdef _symfony2 sf
 #Alias
 alias sf2='php app/console'
 alias sf2clear='php app/console cache:clear'
-

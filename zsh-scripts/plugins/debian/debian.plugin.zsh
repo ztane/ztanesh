@@ -183,4 +183,3 @@ kerndeb () {
     time fakeroot make-kpkg --append-to-version "$appendage" --revision \
         "$revision" kernel_image kernel_headers
 }
-

@@ -14,7 +14,7 @@ then
     BACKED_UP_CONFIG=~/.zshrc.backup
 fi
 
-if [[ -f "$BACKED_UP_CONFIG" || -h "$BACKED_UP_CONFIG" ]]
+if [[ -f "$BACKED_UP_CONFIG" || -h "$BACKED_UP_CONFIG" ]]
 then
     echo "Restoring $BACKED_UP_CONFIG to ~/.zshrc"
 

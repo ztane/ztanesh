@@ -9,7 +9,7 @@ def grouper(iterable, n, fillvalue=None):
 
 def get_colored_code(k):
     return '\033[48;5;%dm\033[%sm%3d\033[0m' % \
-             (k, '30' if 51 < k < 232 or k >= 238 else '37;1', k) 
+             (k, '30' if 51 < k < 232 or k >= 238 else '37;1', k)
 
 cube_formatted = [
     get_colored_code(k) for k in range(16, 232)

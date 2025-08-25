@@ -41,7 +41,7 @@ How to install
         plugins=( [plugins...] zsh-syntax-highlighting)
 
 * Source `~/.zshrc`  to take changes into account:
-    
+
         source ~/.zshrc
 
 

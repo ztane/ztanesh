@@ -25,4 +25,3 @@ class Client(base.XClientBase):
 def __main__(args):
     client = Client()
     client.run(args)
-

@@ -20,7 +20,7 @@
 #  - GPM on Linux little-endian systems such as i386 (at least)
 #  - X clipboard handling if xsel(1) or xclip(1) is available (see
 #    note below).
-# 
+#
 # addionnaly, if you are using xterm and don't want to use the mouse
 # tracking system, you can map some button click events so that they
 # send \E[M<bt>^X[<y><x> where <bt> is the character 0x20 + (0, 1, 2)
@@ -125,7 +125,7 @@
 # to the context menu. Use Ctrl-Insert to put the selection on the
 # clipboard.
 # dtterm: no mouse support but the selection works OK.
-# 
+#
 # bugs:
 #   - the GPM support was not much tested (was tested with gpm 1.19.6 on
 #     a linux 2.6.9, AMD Athlon)
@@ -258,7 +258,7 @@ if [[ -n $x_clipboard_tool && $ZSH_X_COPY_PASTING -gt 0 ]]; then
       }
       zle -N '${w#.}
   done
-  
+
   zle -N push-x-selection
   zle -N push-x-cut_buffer0
 
@@ -419,7 +419,7 @@ if [[ $TERM = *[xeEk]term* ||
     # store the characters i for which x(i) <= mx < x(i+1) for every
     # value of y in the pos array. We also get the Y(CURSOR), so that at
     # the end, we're able to say which pos element is the right one
-    
+
     local -a pos # array holding the possible positions of
 		 # the mouse pointer
     local -i n x=0 y=1 cursor=$((${#cur_prompt}+$CURSOR+1))
@@ -485,14 +485,14 @@ if [[ $TERM = *[xeEk]term* ||
       ;;
     esac
   }
-  
+
   zle -N handle-mouse-event
 
   handle-xterm-mouse-event() {
     local last_status=$?
     emulate -L zsh
     local bt mx my
-    
+
     # either xterm mouse tracking or bound xterm event
     # read the event from the terminal
     read -k bt # mouse button, x, y reported after \e[M
@@ -592,7 +592,7 @@ if [[ $TERM = *[xeEk]term* ||
 	  zle-update-mouse-driver
 	fi
       }
-    fi 
+    fi
   else
     # xterm-like mouse support
     zmodload -i zsh/parameter # needed for $functions

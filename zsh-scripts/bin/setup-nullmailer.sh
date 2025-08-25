@@ -67,5 +67,3 @@ sudo /etc/init.d/nullmailer reload
 echo "This is a test message from ${USER}@${HOSTNAME} at $(date)" | sendmail $TEST_ADDRESS
 
 echo "Test mail send to $TEST_ADDRESS"
-
-

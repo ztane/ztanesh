@@ -271,4 +271,3 @@ Authors
 * mouse.zsh: Stephane Chazelas
 
 * Gentoo: Alberto Zuin
-

@@ -23,7 +23,7 @@ if len(sys.argv) == 1:
        os.execlp("gnome-terminal", "gnome-terminal")
    except:
        pass
-   
+
    try:
        os.execlp("xterm", "xterm")
    except:
@@ -46,4 +46,3 @@ import mimetypes
 type, encoding = mimetypes.guess_type(path)
 if type == None:
     print >> sys.stderr, "Can't deduce the type for %s" % path
-

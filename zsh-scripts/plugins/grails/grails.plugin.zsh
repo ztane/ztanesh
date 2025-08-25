@@ -7,7 +7,7 @@ _enumerateGrailsScripts() {
     then
         directories+=(plugins/*/scripts)
     fi
-    
+
     # Enumerate all of the Groovy files
     files=()
     for dir in $directories;
@@ -17,13 +17,13 @@ _enumerateGrailsScripts() {
             files+=($dir/[^_]*.groovy)
         fi
     done
-    
+
     # Don't try to basename ()
     if [ ${#files} -eq 0 ];
     then
         return
     fi
-    
+
     # - Strip the path
     # - Remove all scripts with a leading '_'
     # - PackagePlugin_.groovy -> PackagePlugin
@@ -36,19 +36,19 @@ _enumerateGrailsScripts() {
         | sort                                  \
         | uniq
 }
- 
+
 _grails() {
     if (( CURRENT == 2 )); then
         scripts=( $(_enumerateGrailsScripts) )
-        
+
         if [ ${#scripts} -ne 0 ];
         then
             _multi_parts / scripts
             return
         fi
     fi
-    
+
     _files
 }
- 
+
 compdef _grails grails

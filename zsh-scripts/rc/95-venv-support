@@ -1,5 +1,5 @@
 function check_unset_venv {
-    for i in . .. ../.. ../../.. ../../../.. ../../../../.. 
+    for i in . .. ../.. ../../.. ../../../.. ../../../../..
     do
         if [[ -r "$i/.venv-path" ]]
         then
@@ -12,7 +12,7 @@ function check_unset_venv {
 function activate-venv {
     local new_env
     new_env=$(check_unset_venv)
-    if [[ "$new_env" == "" ]] 
+    if [[ "$new_env" == "" ]]
     then
         echo "No environment found"
         return

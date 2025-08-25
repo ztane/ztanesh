@@ -25,4 +25,3 @@ then
 else
     echo "highlight has been installed."
 fi
-

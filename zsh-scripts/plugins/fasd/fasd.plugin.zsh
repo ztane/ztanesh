@@ -3,4 +3,3 @@ if [ $commands[fasd] ]; then # check if fasd is installed
   alias v='f -e vim'
   alias o='a -e open'
 fi
-

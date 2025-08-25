@@ -21,4 +21,3 @@ case "$1" in
           # We don’t handle this format.
           exit 1
 esac
-
