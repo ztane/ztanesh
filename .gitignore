@@ -6,3 +6,4 @@ allrcs.zwc
 zsh-scripts/cache
 binfix/python2
 *.pyc
+.idea
