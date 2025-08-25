@@ -2,7 +2,7 @@
 function git_prompt_info() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || \
   ref=$(git rev-parse --short HEAD 2> /dev/null) || return
-  echo "$ZSH_THEME_GIT_PROMPT_PREFIX${ref#refs/heads/}$(parse_git_dirty)${git_remote_status}$ZSH_THEME_GIT_PROMPT_SUFFIX"
+  echo "$ZSH_THEME_GIT_PROMPT_PREFIX${ref#refs/heads/}$(parse_git_dirty)$(git_remote_status)$(git_precommit_status)$ZSH_THEME_GIT_PROMPT_SUFFIX"
 }
 
 
@@ -122,9 +122,52 @@ function git_compare_version() {
   echo 1
 }
 
+# Cache keyed by repo root
+typeset -gA __GIT_PRECOMMIT_CACHE
+
+git_precommit_status() {
+  # bail if not in a git repo
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    return
+  fi
+
+  local repo_root
+  repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || return
+
+  # reuse cached indicator if available
+  if [[ -n ${__GIT_PRECOMMIT_CACHE[$repo_root]} ]]; then
+    echo -n "${__GIT_PRECOMMIT_CACHE[$repo_root]}"
+    return
+  fi
+
+  local config="$repo_root/.pre-commit-config.yaml"
+  local hook="$repo_root/.git/hooks/pre-commit"
+  local indicator="$ZSH_THEME_GIT_PROMPT_PRECOMMIT_OK"
+
+  if [[ -f $config ]]; then
+    if [[ ! -x $hook ]] || ! grep -q "pre-commit" "$hook" 2>/dev/null; then
+      indicator="$ZSH_THEME_GIT_PROMPT_PRECOMMIT_FAIL"
+    fi
+  else
+    indicator="$ZSH_THEME_GIT_PROMPT_PRECOMMIT_WARN"
+  fi
+
+  __GIT_PRECOMMIT_CACHE[$repo_root]="$indicator"
+  echo -n "$indicator"
+}
+
+# clear all pre-commit status cache entries
+git_precommit_clear_cache() {
+  __GIT_PRECOMMIT_CACHE=()   # reset associative array
+}
+
+# wrap pre-commit command
+pre-commit() {
+  git_precommit_clear_cache        # flush cache before any run
+  command pre-commit "$@"          # call the real pre-commit
+}
+
 #this is unlikely to change so make it all statically assigned
 POST_1_7_2_GIT=$(git_compare_version "1.7.2")
 #clean up the namespace slightly by removing the checker function
 unset -f git_compare_version
-
-

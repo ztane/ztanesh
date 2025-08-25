@@ -108,9 +108,12 @@ setup_prompt
 # Git repo indicator integration
 #
 ZSH_THEME_GIT_PROMPT_PREFIX="[%{$fg[red]%}"
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
-ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[yellow]%}✗%{$fg[white]%}]"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[white]%}]"
-ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE="⭳"    # Down arrow with base
-ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE="⭱"     # Up arrow with base
-ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE="⮃"  # Up arrow left of down arrow
+ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg[white]%}]%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[yellow]%}✘"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}✔"
+ZSH_THEME_GIT_PROMPT_BEHIND_REMOTE="%{$fg[yellow]%}↓"    # Large down arrow
+ZSH_THEME_GIT_PROMPT_AHEAD_REMOTE="%{$fg[yellow]%}↑"     # Large up arrow
+ZSH_THEME_GIT_PROMPT_DIVERGED_REMOTE="%{$fg[red]%}⮃"  # Up arrow left of down arrow
+ZSH_THEME_GIT_PROMPT_PRECOMMIT_OK=""                        # nothing if all fine
+ZSH_THEME_GIT_PROMPT_PRECOMMIT_WARN="%{$fg[yellow]%}?%{$reset_color%}"  # no config
+ZSH_THEME_GIT_PROMPT_PRECOMMIT_FAIL="%{$fg[red]%}%B!%b%{$reset_color%}"  # config exists but not installed
