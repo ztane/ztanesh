@@ -72,6 +72,17 @@ function git-add-commit-push() {
         git add -A && git commit -m "$1" && git push
 }
 
+# Stop and remove all Docker containers
+function docker-nuke() {
+        local containers
+        containers=$(docker ps -aq)
+        if [[ -n "$containers" ]]; then
+                docker stop ${=containers} && docker rm ${=containers}
+        else
+                echo "No containers to remove"
+        fi
+}
+
 # Power grep with better output and case-insensitivity
 alias xgrep='egrep -Ri --line-number --before-context=3 --after-context=3 --color=always'
 
