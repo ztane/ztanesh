@@ -28,6 +28,7 @@ class LunchItem:
     external_link: Optional[str] = None
     distance_m: int = 0
     lunch_time: Optional[str] = None
+    distance_is_walking: bool = False
 
 COOKIES = {
     "location_v2": '{"lat":"65.01099","lng":"25.47689","formattedAddress":"Mäkelininkatu+31, Oulu"}',
@@ -45,6 +46,43 @@ HEADERS = {
 }
 
 BASE_URL = "https://www.lounaat.info/ajax/filter"
+
+# Walking distances in meters from Mäkelininkatu 31, Oulu
+# Source: Google Maps walking directions, 2026-03-12
+WALKING_DISTANCES = {
+    "Alfred Kitchen & Bar": 73,
+    "Little New York": 136,
+    "The Flying Bull": 125,
+    "Ravintola Gaia": 202,
+    "Gaia": 202,
+    "Grill It! Oulu": 290,
+    "Cafe Mallaamo": 271,
+    "La Torrefazione": 250,
+    "Ravintola Pekuri": 565,
+    "Ravintola Sarkka": 293,
+    "Rosso Oulu": 250,
+    "Sauraha": 348,
+    "Frans & Camille Oulu": 415,
+    "Ravintola Puistola": 418,
+    "Amarillo Oulu": 500,
+    "Ravintola Pannu": 435,
+    "Food & Co Kantakortteli": 522,
+    "Antell Piha": 565,
+    "Valveen Paljetti": 545,
+    "Cafe Rooster": 637,
+    "Food & Co MIN Ydinkeskusta": 685,
+    "Kauppuri 5 Burgers": 606,
+    "Pancho Villa Oulu Keskusta": 573,
+    "Tuba": 792,
+    "Restaurant Ule": 931,
+    "Voimala 1889": 904,
+    "Teatteriravintola Aulis": 830,
+    "Opetusravintola Hilikku": 1100,
+    "De Gamlas Hem": 1300,
+    "Huovisen leipomo - Iso-Ilmari": 1200,
+    "Lasaretti": 1400,
+    "Makujen Paljetti": 1800,
+}
 
 DIET_COLOURS = {
     "l": ("L", "yellow"),
@@ -104,8 +142,6 @@ def fetch_lunch_items(max_distance: int) -> List[LunchItem]:
             if not dist_tag:
                 continue
             distance_m = parse_distance(dist_tag.text.strip())
-            if distance_m > max_distance:
-                continue
 
             lunch_time_tag = r.select_one("p.lunch:not(.closed)")
             lunch_time = None
@@ -131,12 +167,24 @@ def fetch_lunch_items(max_distance: int) -> List[LunchItem]:
                     price = price_tag.get_text(strip=True) if price_tag else None
                     lines.append(MenuLine(dish=dish_text, price=price, diet_tags=diet_keys))
 
+            walking_dist = WALKING_DISTANCES.get(name)
+            if walking_dist is not None:
+                effective_distance = walking_dist
+                is_walking = True
+            else:
+                effective_distance = distance_m
+                is_walking = False
+
+            if effective_distance > max_distance:
+                continue
+
             results.append(LunchItem(
                 name=name,
                 lines=lines,
                 external_link=external_link,
-                distance_m=distance_m,
-                lunch_time=lunch_time
+                distance_m=effective_distance,
+                lunch_time=lunch_time,
+                distance_is_walking=is_walking,
             ))
 
     return sorted(results, key=lambda x: x.distance_m)
@@ -181,7 +229,13 @@ def print_lunches(lunches: List[LunchItem]):
             console.print(f"[bold yellow]{weekday} {date_str}[/bold yellow]\n")
 
         for lunch in lunches:
-            header = Text(f"{lunch.name} ({lunch.distance_m} m)", style="bold blue")
+            dist_label = f"{lunch.distance_m} m" if lunch.distance_is_walking else f"~{lunch.distance_m} m"
+            header = Text(f"{lunch.name} (", style="bold blue")
+            if lunch.distance_is_walking:
+                header.append(f"🚶{dist_label}", style="bold green")
+            else:
+                header.append(dist_label, style="bold yellow")
+            header.append(")", style="bold blue")
             if lunch.lunch_time:
                 header.append(f" [{lunch.lunch_time}]", style="dim cyan")
             console.print(header)
